@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<nav class="top-navbar">
+    <div class="logo">SocioSphere Admin</div>
+
+    <ul class="nav-menu">
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="admin.html">ADMIN DASHBOARD</a></li>
+    </ul>
+
+    <div class="right-controls">
+        <button class="dark-toggle">🌓</button>
+    </div>
+</nav>
+
+<div class="page-container">
+    <h2 class="page-title">Admin Dashboard</h2>
+
+    <div class="issue-card">
+        <p id="totalUsers">Total Users: Loading...</p>
+        <p id="totalIssues">Total Issues: Loading...</p>
+        <p id="pendingCount">Pending: 0</p>
+        <p id="progressCount">In Progress: 0</p>
+        <p id="resolvedCount">Resolved: 0</p>
+    </div>
+
+    <!-- AUTHORITY DASHBOARD LINK -->
+<button onclick="window.location='authority.html'" class="auth-btn">
+    Go to Authority Dashboard
+</button>
+
+<h3>All Issues</h3>
+<div id="adminIssueList"></div>
+
+<script src="js/app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    let users = JSON.parse(localStorage.getItem("users") || "{}");
+    let issues = JSON.parse(localStorage.getItem("issues") || "[]");
+
+    // Show stats
+    document.getElementById("totalUsers").textContent = "Total Users: " + Object.keys(users).length;
+    document.getElementById("totalIssues").textContent = "Total Issues: " + issues.length;
+
+    let pending = issues.filter(i => i.status === "pending").length;
+    let progress = issues.filter(i => i.status === "progress").length;
+    let resolved = issues.filter(i => i.status === "resolved").length;
+
+    document.getElementById("pendingCount").textContent = "Pending: " + pending;
+    document.getElementById("progressCount").textContent = "In Progress: " + progress;
+    document.getElementById("resolvedCount").textContent = "Resolved: " + resolved;
+
+    // List all issues
+    let box = document.getElementById("adminIssueList");
+
+    issues.forEach((issue, index) => {
+        box.innerHTML += `
+            <div class="issue-card">
+                <h3>${issue.text}</h3>
+                <p>📍 ${issue.location}</p>
+                <p>📅 ${issue.date}</p>
+                <p>👤 ${issue.user}</p>
+
+                <span class="status-badge status-${issue.status}">
+                    ${issue.status.toUpperCase()}
+                </span>
+
+                <select class="status-select" onchange="changeStatus(${index}, this.value)">
+                    <option value="pending" ${issue.status === "pending" ? "selected" : ""}>Pending</option>
+                    <option value="progress" ${issue.status === "progress" ? "selected" : ""}>In Progress</option>
+                    <option value="resolved" ${issue.status === "resolved" ? "selected" : ""}>Resolved</option>
+                </select>
+            </div>
+        `;
+    });
+});
+</script>
+
+</body>
+</html>

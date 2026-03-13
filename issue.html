@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Issue Details</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<div class="page-container">
+
+<h2 id="issueTitle"></h2>
+
+<p id="issueUser"></p>
+
+<p id="issueDescription"></p>
+
+<h3>Status</h3>
+
+<div class="status-tracker">
+
+Submitted → In Progress → Resolved
+
+</div>
+
+<div class="comment-box">
+
+<h3>Comments</h3>
+
+<div id="commentList"></div>
+
+<input id="commentInput" placeholder="Write comment">
+
+<button onclick="addComment()">Post</button>
+
+</div>
+
+</div>
+
+<script src="js/app.js"></script>
+<div id="google_translate_element"></div>
+
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement(
+    {
+      pageLanguage: 'en',
+      includedLanguages: 'en,te,hi,ta,kn,ml,bn,gu,mr,pa,ur,fr,de,es,ja,ko,zh-CN,ar,ru,it,pt',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    },
+    'google_translate_element'
+  );
+}
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
