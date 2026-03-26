@@ -1,6 +1,6 @@
-console.log("SocioSphere Loaded");
+console.log("SocioSphere Final Loaded");
 
-const ADMIN_EMAIL = "[admin@sociosphere.com](mailto:admin@sociosphere.com)";
+/* ================= MAIN LOAD ================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -10,41 +10,10 @@ initializeReportForm();
 initializeCommunityFeed();
 initializeMyIssues();
 initializeProfile();
-initializeAdminDashboard();
 initializeAutoCategory();
+initializeLocationAutocomplete();
 
 });
-
-/* ================= AUTO CATEGORY ================= */
-
-function detectCategory(text){
-
-text=text.toLowerCase();
-
-if(text.includes("road")||text.includes("pothole")) return "Road";
-if(text.includes("water")||text.includes("pipe")||text.includes("leak")) return "Water";
-if(text.includes("electric")||text.includes("power")) return "Electricity";
-if(text.includes("garbage")||text.includes("trash")) return "Garbage";
-
-return "Road";
-
-}
-
-function initializeAutoCategory(){
-
-const issueInput=document.getElementById("issueText");
-const categorySelect=document.getElementById("category");
-
-if(!issueInput||!categorySelect) return;
-
-issueInput.addEventListener("input",()=>{
-
-const predicted=detectCategory(issueInput.value);
-categorySelect.value=predicted;
-
-});
-
-}
 
 /* ================= DARK MODE ================= */
 
@@ -89,19 +58,14 @@ return;
 let users=JSON.parse(localStorage.getItem("users")||"{}");
 
 if(!users[email]){
-
 users[email]={name,email,password:pass};
 alert("Account created!");
-
 }else{
-
 if(users[email].password!==pass){
 alert("Incorrect password");
 return;
 }
-
 alert("Login successful!");
-
 }
 
 localStorage.setItem("users",JSON.stringify(users));
@@ -123,28 +87,26 @@ showProfileIcon();
 function showProfileIcon(){
 
 let logged=localStorage.getItem("loggedIn");
-
 if(!logged) return;
 
 let users=JSON.parse(localStorage.getItem("users")||"{}");
-
 let name=users[logged]?.name||"U";
 
 document.querySelectorAll(".login-btn").forEach(btn=>{
-
 btn.outerHTML=`
-
 <div class="profile-icon" onclick="window.location='profile.html'">
 ${name.charAt(0).toUpperCase()}
 </div>
 <button class="logout-btn" onclick="logout()">Logout</button>
 `;
-
 });
 
 }
 
-/* ================= LOGIN POPUP ================= */
+function logout(){
+localStorage.removeItem("loggedIn");
+location.reload();
+}
 
 function openLogin(){
 let overlay=document.getElementById("loginOverlay");
@@ -156,9 +118,71 @@ let overlay=document.getElementById("loginOverlay");
 if(overlay) overlay.style.display="none";
 }
 
-function logout(){
-localStorage.removeItem("loggedIn");
-location.reload();
+/* ================= AUTO CATEGORY ================= */
+
+function detectCategory(text){
+
+text=text.toLowerCase();
+
+if(text.includes("road")||text.includes("pothole")) return "Road";
+if(text.includes("water")||text.includes("pipe")) return "Water";
+if(text.includes("electric")) return "Electricity";
+if(text.includes("garbage")) return "Garbage";
+
+return "Road";
+}
+
+function initializeAutoCategory(){
+
+const issueInput=document.getElementById("issueText");
+const categorySelect=document.getElementById("category");
+
+if(!issueInput||!categorySelect) return;
+
+issueInput.addEventListener("input",()=>{
+categorySelect.value=detectCategory(issueInput.value);
+});
+
+}
+
+/* ================= LIVE LOCATION ================= */
+
+function getLiveLocation(){
+
+if(!navigator.geolocation){
+alert("Geolocation not supported");
+return;
+}
+
+navigator.geolocation.getCurrentPosition(
+
+async (position)=>{
+
+let lat = position.coords.latitude;
+let lon = position.coords.longitude;
+
+try{
+
+let response = await fetch(
+`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+);
+
+let data = await response.json();
+
+document.getElementById("location").value = data.display_name;
+
+}catch{
+document.getElementById("location").value = `${lat}, ${lon}`;
+}
+
+},
+
+()=>{
+alert("Please allow location access");
+}
+
+);
+
 }
 
 /* ================= REPORT ISSUE ================= */
@@ -166,7 +190,6 @@ location.reload();
 function initializeReportForm(){
 
 const form=document.getElementById("reportForm");
-
 if(!form) return;
 
 form.addEventListener("submit",(e)=>{
@@ -186,21 +209,16 @@ const reader=new FileReader();
 
 reader.onload=function(e){
 
-const imageData=e.target.result;
-
 issues.push({
-
 text:description,
 location:location,
 category:category,
-priority:"low",
 date:new Date().toLocaleString(),
 user:localStorage.getItem("loggedIn"),
-image:imageData,
+image:e.target.result,
 support:0,
 comments:[],
 status:"Submitted"
-
 });
 
 localStorage.setItem("issues",JSON.stringify(issues));
@@ -224,8 +242,7 @@ reader.onload({target:{result:null}});
 
 function initializeCommunityFeed(){
 
-const feed=document.getElementById("publicIssueFeed");
-
+const feed=document.getElementById("communityFeed") || document.getElementById("publicIssueFeed");
 if(!feed) return;
 
 let issues=JSON.parse(localStorage.getItem("issues")||"[]");
@@ -235,12 +252,15 @@ feed.innerHTML="";
 issues.reverse().forEach(issue=>{
 
 feed.innerHTML+=`
-
 <div class="issue-card">
 
 <div style="display:flex;justify-content:space-between">
+<strong>${issue.user}</strong>
 
-<strong>${issue.user}</strong> <span>📍 ${issue.location}</span>
+<span style="cursor:pointer;color:blue;text-decoration:underline;"
+onclick="openMap('${issue.location}')">
+📍 ${issue.location}
+</span>
 
 </div>
 
@@ -248,14 +268,8 @@ feed.innerHTML+=`
 
 ${issue.image?`<img src="${issue.image}" class="issue-image">`:""}
 
-<div class="map-icon" onclick="openMap('${issue.location}')">
-🗺 View Location
-</div>
-
 <p>Status: ${issue.status}</p>
-
 <p>Category: ${issue.category}</p>
-<p>Priority: ${issue.priority}</p>
 
 <div class="post-actions">
 
@@ -273,79 +287,24 @@ ${issue.image?`<img src="${issue.image}" class="issue-image">`:""}
 
 </div>
 
+<div id="comment-${issue.date}" style="display:none;margin-top:10px;">
+
+<input id="input-${issue.date}" placeholder="Write comment..." style="width:70%">
+
+<button onclick="postComment('${issue.date}')">Post</button>
+
+<div>
+${(issue.comments||[]).map(c=>`
+<p><strong>${c.user}</strong>: ${c.text}</p>
+`).join("")}
 </div>
-
-`;
-
-});
-
-}
-
-/* ================= MY ISSUES ================= */
-
-function initializeMyIssues(){
-
-const list=document.getElementById("issuesList");
-
-if(!list) return;
-
-let logged=localStorage.getItem("loggedIn");
-
-let issues=JSON.parse(localStorage.getItem("issues")||"[]");
-
-let myIssues=issues.filter(i=>i.user===logged);
-
-list.innerHTML="";
-
-myIssues.reverse().forEach(issue=>{
-
-list.innerHTML+=`
-
-<div class="issue-card">
-
-<h4>${issue.text}</h4>
-
-<p>📍 ${issue.location}</p>
-
-${issue.image?`<img src="${issue.image}" class="issue-image">`:""}
-
-<p>Status: ${issue.status}</p>
 
 </div>
 
+</div>
 `;
 
 });
-
-}
-
-/* ================= PROFILE PAGE ================= */
-
-function initializeProfile(){
-
-if(!window.location.pathname.includes("profile.html")) return;
-
-let logged=localStorage.getItem("loggedIn");
-
-let users=JSON.parse(localStorage.getItem("users")||"{}");
-
-let user=users[logged];
-
-if(!user) return;
-
-document.getElementById("profileName").innerText="Name: "+user.name;
-
-document.getElementById("profileEmail").innerText="Email: "+user.email;
-
-document.getElementById("profileCircle").innerText=
-user.name.charAt(0).toUpperCase();
-
-let issues=JSON.parse(localStorage.getItem("issues")||"[]");
-
-let myIssues=issues.filter(i=>i.user===logged);
-
-document.getElementById("profileIssues").innerText=
-"Reported Issues: "+myIssues.length;
 
 }
 
@@ -365,51 +324,101 @@ location.reload();
 
 }
 
+/* ================= COMMENTS ================= */
+
+function toggleComment(date){
+
+let box=document.getElementById("comment-"+date);
+
+box.style.display = box.style.display === "none" ? "block" : "none";
+
+}
+
+function postComment(date){
+
+let input=document.getElementById("input-"+date);
+
+let text=input.value.trim();
+
+if(!text) return;
+
+let issues=JSON.parse(localStorage.getItem("issues")||"[]");
+
+let issue=issues.find(i=>i.date===date);
+
+issue.comments = issue.comments || [];
+
+issue.comments.push({
+user:localStorage.getItem("loggedIn"),
+text:text
+});
+
+localStorage.setItem("issues",JSON.stringify(issues));
+
+location.reload();
+
+}
+
 /* ================= SHARE ================= */
 
 function shareIssue(){
 
 navigator.clipboard.writeText(window.location.href);
-alert("Post link copied!");
+
+alert("Link copied! Share with others 🚀");
 
 }
 
 /* ================= MAP ================= */
 
 function openMap(location){
-
-let url="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(location);
-
-window.open(url,"_blank");
-
-}
-/* ================= LIVE LOCATION ================= */
-
-function getLiveLocation(){
-
-if(!navigator.geolocation){
-
-alert("Geolocation not supported");
-return;
-
+window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`);
 }
 
-navigator.geolocation.getCurrentPosition(
+/* ================= MY ISSUES ================= */
 
-(position)=>{
+function initializeMyIssues(){
 
-let lat = position.coords.latitude;
-let lon = position.coords.longitude;
+const list=document.getElementById("issuesList");
+if(!list) return;
 
-document.getElementById("location").value = `${lat}, ${lon}`;
+let user=localStorage.getItem("loggedIn");
 
-},
+let issues=JSON.parse(localStorage.getItem("issues")||"[]");
 
-()=>{
-alert("Please allow location access");
+list.innerHTML="";
+
+issues.filter(i=>i.user===user).reverse().forEach(issue=>{
+
+list.innerHTML+=`
+<div class="issue-card">
+<h4>${issue.text}</h4>
+<p>📍 ${issue.location}</p>
+
+${issue.image ? `<img src="${issue.image}" class="issue-image">` : ""}
+
+<p>Status: ${issue.status}</p>
+</div>
+`;
+
+});
+
 }
 
-);
+/* ================= PROFILE ================= */
+
+function initializeProfile(){
+
+if(!window.location.pathname.includes("profile.html")) return;
+
+let logged=localStorage.getItem("loggedIn");
+let users=JSON.parse(localStorage.getItem("users")||"{}");
+
+let user=users[logged];
+if(!user) return;
+
+document.getElementById("profileName").innerText=user.name;
+document.getElementById("profileEmail").innerText=user.email;
 
 }
 
@@ -417,60 +426,36 @@ alert("Please allow location access");
 
 function initializeLocationAutocomplete(){
 
-const input = document.getElementById("location");
-const suggestionsBox = document.getElementById("locationSuggestions");
+const input=document.getElementById("location");
+const box=document.getElementById("locationSuggestions");
 
-if(!input || !suggestionsBox) return;
+if(!input||!box) return;
 
-input.addEventListener("input", async () => {
+input.addEventListener("input",async ()=>{
 
-let query = input.value.trim();
-
-if(query.length < 3){
-suggestionsBox.innerHTML = "";
+let q=input.value.trim();
+if(q.length<3){
+box.innerHTML="";
 return;
 }
 
-try{
+let res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
+let data=await res.json();
 
-let response = await fetch(
-`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
-);
+box.innerHTML="";
 
-let data = await response.json();
+data.slice(0,5).forEach(p=>{
+let div=document.createElement("div");
+div.innerText=p.display_name;
 
-suggestionsBox.innerHTML = "";
-
-data.slice(0,5).forEach(place => {
-
-let div = document.createElement("div");
-div.className = "suggestion-item";
-div.innerText = place.display_name;
-
-div.onclick = () => {
-input.value = place.display_name;
-suggestionsBox.innerHTML = "";
+div.onclick=()=>{
+input.value=p.display_name;
+box.innerHTML="";
 };
 
-suggestionsBox.appendChild(div);
+box.appendChild(div);
+});
 
 });
 
-}catch(err){
-console.log("Location fetch error", err);
 }
-
-});
-
-/* close when clicked outside */
-document.addEventListener("click",(e)=>{
-if(!input.contains(e.target)){
-suggestionsBox.innerHTML="";
-}
-});
-
-}
-
-/* CALL FUNCTION */
-initializeLocationAutocomplete();
-

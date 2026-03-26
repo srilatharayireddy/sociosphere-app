@@ -20,13 +20,11 @@
 </ul>
 
 <div class="right-controls">
-<div id="google_translate_element"></div>
 <button class="dark-toggle">🌓</button>
 <a class="login-btn" onclick="openLogin()">Login</a>
 </div>
 
 </nav>
-
 
 <div class="page-container">
 
@@ -40,19 +38,22 @@
 <label>Upload Image</label>
 <input type="file" id="imageInput" accept="image/*">
 
+<!-- ✅ LIVE LOCATION -->
 <label>Location</label>
-<input type="text" id="location" placeholder="Enter location" required>
+<input type="text" id="location" placeholder="Click button to get live location" required readonly>
+
+<button type="button" onclick="getLiveLocation()">📍 Get Live Location</button>
+
+<div id="locationSuggestions" class="suggestions-box"></div>
 
 <label>Category</label>
 <select id="category">
-
 <option value="Road">Road</option>
 <option value="Water">Water</option>
 <option value="Electricity">Electricity</option>
 <option value="Garbage">Garbage</option>
 <option value="Women Safety">Women Safety</option>
 <option value="Child Safety">Child Safety</option>
-
 </select>
 
 <button type="submit" class="submit-btn">Submit Issue</button>
@@ -61,35 +62,7 @@
 
 </div>
 
-
-<script>
-function googleTranslateElementInit() {
-new google.translate.TranslateElement(
-{pageLanguage:'en', includedLanguages:'en,te,hi'},
-'google_translate_element'
-);
-}
-</script>
-
-<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
 <script src="js/app.js"></script>
-<div id="google_translate_element"></div>
-
-<script>
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement(
-    {
-      pageLanguage: 'en',
-      includedLanguages: 'en,te,hi,ta,kn,ml,bn,gu,mr,pa,ur,fr,de,es,ja,ko,zh-CN,ar,ru,it,pt',
-      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-    },
-    'google_translate_element'
-  );
-}
-</script>
-
-<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 </body>
 </html>
