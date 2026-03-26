@@ -645,5 +645,40 @@ background:#2563eb;
 color:white;
 
 }
+.location-box{
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+.location-btn{
+padding:10px 12px;
+border:none;
+background:#2563eb;
+color:white;
+border-radius:8px;
+cursor:pointer;
+font-size:18px;
+}
+
+.suggestions-box{
+background:white;
+border:1px solid #ccc;
+border-radius:8px;
+margin-top:5px;
+max-height:200px;
+overflow-y:auto;
+position:relative;
+z-index:10;
+}
+
+.suggestion-item{
+padding:10px;
+cursor:pointer;
+}
+
+.suggestion-item:hover{
+background:#f1f5f9;
+}
 
 

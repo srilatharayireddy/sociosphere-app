@@ -383,3 +383,94 @@ let url="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(lo
 window.open(url,"_blank");
 
 }
+/* ================= LIVE LOCATION ================= */
+
+function getLiveLocation(){
+
+if(!navigator.geolocation){
+
+alert("Geolocation not supported");
+return;
+
+}
+
+navigator.geolocation.getCurrentPosition(
+
+(position)=>{
+
+let lat = position.coords.latitude;
+let lon = position.coords.longitude;
+
+document.getElementById("location").value = `${lat}, ${lon}`;
+
+},
+
+()=>{
+alert("Please allow location access");
+}
+
+);
+
+}
+
+/* ================= LOCATION AUTOCOMPLETE ================= */
+
+function initializeLocationAutocomplete(){
+
+const input = document.getElementById("location");
+const suggestionsBox = document.getElementById("locationSuggestions");
+
+if(!input || !suggestionsBox) return;
+
+input.addEventListener("input", async () => {
+
+let query = input.value.trim();
+
+if(query.length < 3){
+suggestionsBox.innerHTML = "";
+return;
+}
+
+try{
+
+let response = await fetch(
+`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
+);
+
+let data = await response.json();
+
+suggestionsBox.innerHTML = "";
+
+data.slice(0,5).forEach(place => {
+
+let div = document.createElement("div");
+div.className = "suggestion-item";
+div.innerText = place.display_name;
+
+div.onclick = () => {
+input.value = place.display_name;
+suggestionsBox.innerHTML = "";
+};
+
+suggestionsBox.appendChild(div);
+
+});
+
+}catch(err){
+console.log("Location fetch error", err);
+}
+
+});
+
+/* close when clicked outside */
+document.addEventListener("click",(e)=>{
+if(!input.contains(e.target)){
+suggestionsBox.innerHTML="";
+}
+});
+
+}
+
+/* CALL FUNCTION */
+initializeLocationAutocomplete();
+
