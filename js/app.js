@@ -125,11 +125,19 @@ function detectCategory(text){
 text=text.toLowerCase();
 
 if(text.includes("road")||text.includes("pothole")) return "Road";
-if(text.includes("water")||text.includes("pipe")) return "Water";
-if(text.includes("electric")) return "Electricity";
-if(text.includes("garbage")) return "Garbage";
+if(text.includes("water")||text.includes("pipe")||text.includes("leak")) return "Water";
+if(text.includes("electric")||text.includes("power")||text.includes("street light")) return "Electricity";
+if(text.includes("garbage")||text.includes("trash")||text.includes("waste")) return "Garbage";
+if(text.includes("traffic")) return "Traffic";
+if(text.includes("drain")) return "Drainage";
+if(text.includes("bus")||text.includes("transport")) return "Public Transport";
+if(text.includes("noise")) return "Noise Pollution";
+if(text.includes("air")||text.includes("pollution")) return "Air Pollution";
+if(text.includes("construction")) return "Illegal Construction";
+if(text.includes("animal")||text.includes("dog")) return "Animal Issue";
+if(text.includes("health")||text.includes("hospital")) return "Health & Sanitation";
 
-return "Road";
+return "Other";
 }
 
 function initializeAutoCategory(){
@@ -162,24 +170,15 @@ let lat = position.coords.latitude;
 let lon = position.coords.longitude;
 
 try{
-
-let response = await fetch(
-`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
-);
-
-let data = await response.json();
-
+let res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+let data = await res.json();
 document.getElementById("location").value = data.display_name;
-
 }catch{
 document.getElementById("location").value = `${lat}, ${lon}`;
 }
 
 },
-
-()=>{
-alert("Please allow location access");
-}
+()=>{ alert("Allow location access"); }
 
 );
 
@@ -202,18 +201,16 @@ const description=document.getElementById("issueText").value;
 const location=document.getElementById("location").value;
 const category=document.getElementById("category").value;
 
-const imageInput=document.getElementById("imageInput");
-const file=imageInput.files[0];
-
+const file=document.getElementById("imageInput").files[0];
 const reader=new FileReader();
 
 reader.onload=function(e){
 
 issues.push({
 text:description,
-location:location,
-category:category,
-date:new Date().toLocaleString(),
+location,
+category,
+date:new Date().toISOString(),
 user:localStorage.getItem("loggedIn"),
 image:e.target.result,
 support:0,
@@ -223,16 +220,13 @@ status:"Submitted"
 
 localStorage.setItem("issues",JSON.stringify(issues));
 
-alert("Issue submitted successfully!");
+alert("Issue submitted!");
 window.location="community.html";
 
 };
 
-if(file){
-reader.readAsDataURL(file);
-}else{
-reader.onload({target:{result:null}});
-}
+if(file) reader.readAsDataURL(file);
+else reader.onload({target:{result:null}});
 
 });
 
@@ -252,9 +246,11 @@ feed.innerHTML="";
 issues.reverse().forEach(issue=>{
 
 feed.innerHTML+=`
+
 <div class="issue-card">
 
 <div style="display:flex;justify-content:space-between">
+
 <strong>${issue.user}</strong>
 
 <span style="cursor:pointer;color:blue;text-decoration:underline;"
@@ -302,6 +298,7 @@ ${(issue.comments||[]).map(c=>`
 </div>
 
 </div>
+
 `;
 
 });
@@ -316,45 +313,36 @@ let issues=JSON.parse(localStorage.getItem("issues")||"[]");
 
 let issue=issues.find(i=>i.date===date);
 
+if(issue){
 issue.support=(issue.support||0)+1;
-
 localStorage.setItem("issues",JSON.stringify(issues));
-
 location.reload();
+}
 
 }
 
 /* ================= COMMENTS ================= */
 
 function toggleComment(date){
-
 let box=document.getElementById("comment-"+date);
-
-box.style.display = box.style.display === "none" ? "block" : "none";
-
+box.style.display = box.style.display==="none"?"block":"none";
 }
 
 function postComment(date){
 
 let input=document.getElementById("input-"+date);
-
 let text=input.value.trim();
-
 if(!text) return;
 
 let issues=JSON.parse(localStorage.getItem("issues")||"[]");
-
 let issue=issues.find(i=>i.date===date);
-
-issue.comments = issue.comments || [];
 
 issue.comments.push({
 user:localStorage.getItem("loggedIn"),
-text:text
+text
 });
 
 localStorage.setItem("issues",JSON.stringify(issues));
-
 location.reload();
 
 }
@@ -362,11 +350,8 @@ location.reload();
 /* ================= SHARE ================= */
 
 function shareIssue(){
-
 navigator.clipboard.writeText(window.location.href);
-
-alert("Link copied! Share with others 🚀");
-
+alert("Link copied!");
 }
 
 /* ================= MAP ================= */
@@ -383,7 +368,6 @@ const list=document.getElementById("issuesList");
 if(!list) return;
 
 let user=localStorage.getItem("loggedIn");
-
 let issues=JSON.parse(localStorage.getItem("issues")||"[]");
 
 list.innerHTML="";
@@ -394,9 +378,7 @@ list.innerHTML+=`
 <div class="issue-card">
 <h4>${issue.text}</h4>
 <p>📍 ${issue.location}</p>
-
-${issue.image ? `<img src="${issue.image}" class="issue-image">` : ""}
-
+${issue.image?`<img src="${issue.image}" class="issue-image">`:""}
 <p>Status: ${issue.status}</p>
 </div>
 `;
