@@ -1,0 +1,24 @@
+{
+"logo":"SocioSphere",
+"navHome":"HOME",
+"navReport":"REPORT ISSUE",
+"navMyIssues":"MY ISSUES",
+"navCommunity":"COMMUNITY FEED",
+
+"heroTitle":"YOUR COMMUNITY DESERVES BETTER.",
+"heroDesc":"Report issues, track progress, and help build a safer society.",
+"ctaButton":"REPORT AN ISSUE",
+
+"feature1Title":"Report Instantly",
+"feature1Desc":"Raise issues with text, images, and location.",
+
+"feature2Title":"Track Progress",
+"feature2Desc":"See if your issue is reviewed or resolved.",
+
+"feature3Title":"Bring Change",
+"feature3Desc":"Help build a safer community.",
+
+"namePlaceholder":"Enter your name",
+"emailPlaceholder":"Enter your email",
+"passwordPlaceholder":"Enter password"
+}

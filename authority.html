@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Authority Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<nav class="top-navbar">
+    <div class="logo">SocioSphere Authority</div>
+
+    <ul class="nav-menu">
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="authority.html">AUTHORITY DASHBOARD</a></li>
+    </ul>
+
+    <div class="right-controls">
+        <button class="dark-toggle">🌓</button>
+    </div>
+</nav>
+
+<div class="page-container">
+
+    <h2>Authority Dashboard</h2>
+
+    <label><strong>Select Authority</strong></label>
+
+    <select id="authoritySelect">
+        <option value="Road Department">Road Department</option>
+        <option value="Water Board">Water Board</option>
+        <option value="Electricity Board">Electricity Board</option>
+        <option value="Sanitation Department">Sanitation Department</option>
+        <option value="Women Safety NGO">Women Safety NGO</option>
+        <option value="Child Welfare NGO">Child Welfare NGO</option>
+    </select>
+
+    <br><br>
+
+    <div>
+        Total: <span id="totalCount">0</span> |
+        High: <span id="highCount">0</span> |
+        In Progress: <span id="progressCount">0</span> |
+        Resolved: <span id="resolvedCount">0</span>
+    </div>
+
+    <br>
+
+    <h3>Issues Assigned</h3>
+    <div id="authorityIssueList"></div>
+
+</div>
+
+<script src="js/app.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const dropdown = document.getElementById("authoritySelect");
+
+    let lastAuth = localStorage.getItem("lastAssignedAuthority");
+    if (lastAuth) dropdown.value = lastAuth;
+
+    dropdown.addEventListener("change", loadIssues);
+    loadIssues();
+});
+
+function loadIssues() {
+
+    let authorityName = document.getElementById("authoritySelect").value;
+    let allIssues = JSON.parse(localStorage.getItem("issues") || "[]");
+
+    let filtered = allIssues.filter(issue => issue.assignedTo === authorityName);
+
+    let box = document.getElementById("authorityIssueList");
+    box.innerHTML = "";
+
+    let total = filtered.length;
+    let high = 0;
+    let progress = 0;
+    let resolved = 0;
+
+    filtered.forEach(issue => {
+
+        let priority = issue.priority || "low";
+        let status = issue.status || "pending";
+
+        if (priority === "high") high++;
+        if (status === "progress") progress++;
+        if (status === "resolved") resolved++;
+    });
+
+    document.getElementById("totalCount").innerText = total;
+    document.getElementById("highCount").innerText = high;
+    document.getElementById("progressCount").innerText = progress;
+    document.getElementById("resolvedCount").innerText = resolved;
+
+    if (filtered.length === 0) {
+        box.innerHTML = "<p>No issues assigned.</p>";
+        return;
+    }
+
+    filtered.forEach(issue => {
+
+        let priority = issue.priority || "low";
+        let status = issue.status || "pending";
+
+        let priorityColor =
+            priority === "high"
+                ? "#e74c3c"
+                : priority === "medium"
+                ? "#f39c12"
+                : "#2ecc71";
+
+        box.innerHTML += `
+            <div class="issue-card">
+                <h3>${issue.text}</h3>
+                <p>📍 ${issue.location}</p>
+                <p>📅 ${issue.date}</p>
+                <p>👤 User: ${issue.user}</p>
+                <p>🏷 Category: ${issue.category}</p>
+
+                <span style="background:${priorityColor};color:white;padding:5px 10px;border-radius:8px;">
+                    ${priority.toUpperCase()}
+                </span>
+
+                <br><br>
+
+                <select onchange="updateAuthorityStatus('${issue.date}', this.value)">
+                    <option value="pending" ${status === "pending" ? "selected" : ""}>Pending</option>
+                    <option value="progress" ${status === "progress" ? "selected" : ""}>In Progress</option>
+                    <option value="resolved" ${status === "resolved" ? "selected" : ""}>Resolved</option>
+                </select>
+            </div>
+        `;
+    });
+}
+
+function updateAuthorityStatus(issueDate, newStatus) {
+
+    let issues = JSON.parse(localStorage.getItem("issues") || "[]");
+
+    let issue = issues.find(i => i.date === issueDate);
+
+    if (issue) {
+        issue.status = newStatus;
+        localStorage.setItem("issues", JSON.stringify(issues));
+    }
+
+    loadIssues();
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>My Profile</title>
+
+<link rel="stylesheet" href="css/styles.css">
+
+</head>
+
+<body>
+
+<nav class="top-navbar">
+
+<div class="logo">SocioSphere</div>
+
+<ul class="nav-menu">
+
+<li><a href="index.html">HOME</a></li>
+<li><a href="report.html">REPORT ISSUE</a></li>
+<li><a href="myissues.html">MY ISSUES</a></li>
+<li><a href="community.html">COMMUNITY FEED</a></li>
+
+</ul>
+
+<div class="right-controls">
+
+<div id="google_translate_element"></div>
+
+<button class="dark-toggle">🌓</button>
+
+<button class="logout-btn" onclick="logout()">Logout</button>
+
+</div>
+
+</nav>
+
+
+<div class="page-container">
+
+<h2>My Profile</h2>
+
+<div class="issue-card">
+
+<div class="profile-header">
+
+<div id="profileCircle" class="profile-circle">
+U
+</div>
+
+</div>
+
+<h3 id="profileName">Name: Loading...</h3>
+
+<p id="profileEmail">Email: Loading...</p>
+
+<p id="profilePhone">Phone: Loading...</p>
+
+<p id="profileIssues">Reported Issues: 0</p>
+
+<hr>
+
+<h4>Help</h4>
+
+<p>
+If you face any issue while reporting problems, please contact support.
+</p>
+
+<h4>About</h4>
+
+<p>
+SocioSphere is a community-driven platform that allows citizens to report civic issues like road damage, garbage, electricity problems, and safety concerns.
+</p>
+
+</div>
+
+<h3>Your Issues</h3>
+
+<div id="userIssueList"></div>
+
+</div>
+
+
+<script>
+
+function googleTranslateElementInit() {
+
+new google.translate.TranslateElement(
+{
+pageLanguage: 'en',
+includedLanguages: 'en,te,hi'
+},
+'google_translate_element'
+);
+
+}
+
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script src="js/app.js"></script>
+<div id="google_translate_element"></div>
+
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement(
+    {
+      pageLanguage: 'en',
+      includedLanguages: 'en,te,hi,ta,kn,ml,bn,gu,mr,pa,ur,fr,de,es,ja,ko,zh-CN,ar,ru,it,pt',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    },
+    'google_translate_element'
+  );
+}
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Report Issue</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<nav class="top-navbar">
+
+<div class="logo">SocioSphere</div>
+
+<ul class="nav-menu">
+<li><a href="index.html">HOME</a></li>
+<li><a href="report.html">REPORT ISSUE</a></li>
+<li><a href="myissues.html">MY ISSUES</a></li>
+<li><a href="community.html">COMMUNITY FEED</a></li>
+</ul>
+
+<div class="right-controls">
+<button class="dark-toggle">🌓</button>
+<a class="login-btn" onclick="openLogin()">Login</a>
+</div>
+
+</nav>
+
+<div class="page-container">
+
+<h2>Report an Issue</h2>
+
+<form id="reportForm">
+
+<label>Description</label>
+<textarea id="issueText" placeholder="Describe the issue..." required></textarea>
+
+<label>Upload Image</label>
+<input type="file" id="imageInput" accept="image/*">
+
+<label>Location</label>
+
+<!-- ✅ FIXED: Manual + Live both allowed -->
+<input type="text" id="location" placeholder="Enter location manually or click 'Get Live Location'" required>
+
+<button type="button" onclick="getLiveLocation()">📍 Get Live Location</button>
+
+<div id="locationSuggestions" class="suggestions-box"></div>
+
+<!-- ✅ CATEGORY LIST -->
+<label>Category</label>
+<select id="category">
+
+<option value="Road">Road</option>
+<option value="Water">Water</option>
+<option value="Electricity">Electricity</option>
+<option value="Garbage">Garbage</option>
+
+<option value="Women Safety">Women Safety</option>
+<option value="Child Safety">Child Safety</option>
+
+<option value="Traffic">Traffic</option>
+<option value="Drainage">Drainage</option>
+<option value="Public Transport">Public Transport</option>
+<option value="Street Light">Street Light</option>
+<option value="Noise Pollution">Noise Pollution</option>
+<option value="Air Pollution">Air Pollution</option>
+<option value="Illegal Construction">Illegal Construction</option>
+<option value="Animal Issue">Animal Issue</option>
+<option value="Health & Sanitation">Health & Sanitation</option>
+<option value="Other">Other</option>
+
+</select>
+
+<button type="submit" class="submit-btn">Submit Issue</button>
+
+</form>
+
+</div>
+
+<script src="js/app.js"></script>
+
+</body>
+</html>

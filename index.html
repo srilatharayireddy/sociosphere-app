@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>SocioSphere - Home</title>
+
+<link rel="stylesheet" href="css/styles.css">
+
+</head>
+
+<body>
+
+<nav class="top-navbar">
+
+<div class="logo">SocioSphere</div>
+
+<ul class="nav-menu">
+
+<li><a href="index.html">HOME</a></li>
+<li><a href="report.html">REPORT ISSUE</a></li>
+<li><a href="myissues.html">MY ISSUES</a></li>
+<li><a href="community.html">COMMUNITY FEED</a></li>
+
+</ul>
+
+<div class="right-controls">
+
+<div id="google_translate_element"></div>
+
+<button class="dark-toggle">🌓</button>
+
+<a class="login-btn" onclick="openLogin()">Login</a>
+
+</div>
+
+</nav>
+
+
+<section class="hero-section">
+
+<div class="hero-content">
+
+<h1>
+YOUR COMMUNITY DESERVES BETTER.
+</h1>
+
+<p>
+Report issues, track progress, and help build a safer society.
+</p>
+
+<button class="cta-btn" onclick="window.location='report.html'">
+
+REPORT AN ISSUE
+
+</button>
+
+</div>
+
+</section>
+
+
+<section class="features">
+
+<div class="feature-box">
+
+<h3>Report Instantly</h3>
+
+<p>Raise issues with text, images, and location.</p>
+
+</div>
+
+<div class="feature-box">
+
+<h3>Track Progress</h3>
+
+<p>See if your issue is reviewed or resolved.</p>
+
+</div>
+
+<div class="feature-box">
+
+<h3>Bring Change</h3>
+
+<p>Help build a safer community.</p>
+
+</div>
+
+</section>
+
+
+<div id="loginOverlay" class="overlay">
+
+<div class="login-modal">
+
+<span class="close-btn" onclick="closeLogin()">×</span>
+
+<h2>Welcome Back</h2>
+
+<p>Login or create an account</p>
+
+<input type="text" id="loginName" placeholder="Enter your name">
+
+<input type="email" id="loginEmail" placeholder="Enter your email">
+
+<input type="password" id="loginPassword" placeholder="Enter password">
+
+<button id="loginSubmit">Login</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+function googleTranslateElementInit() {
+
+new google.translate.TranslateElement(
+{
+pageLanguage: 'en',
+includedLanguages: 'en,te,hi'
+},
+'google_translate_element'
+);
+
+}
+
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<script src="js/app.js"></script>
+<div id="google_translate_element"></div>
+
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement(
+    {
+      pageLanguage: 'en',
+      includedLanguages: 'en,te,hi,ta,kn,ml,bn,gu,mr,pa,ur,fr,de,es,ja,ko,zh-CN,ar,ru,it,pt',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    },
+    'google_translate_element'
+  );
+}
+</script>
+
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+
+</html>
