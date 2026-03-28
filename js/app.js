@@ -8,11 +8,11 @@ initializeDarkMode();
 initializeLoginSystem();
 initializeReportForm();
 initializeCommunityFeed();
-initializeMyIssues();
-initializeProfile();
+initializeMyIssues();   // ✅ FIXED
+initializeProfile();    // ✅ FIXED
 initializeAutoCategory();
 initializeLocationAutocomplete();
-addAdminAccess(); // ✅ ADDED
+addAdminAccess();
 
 });
 
@@ -58,7 +58,7 @@ return;
 
 let users=JSON.parse(localStorage.getItem("users")||"{}");
 
-/* ✅ ADMIN BYPASS LOGIN */
+/* ADMIN LOGIN */
 if(email === "admin@sociosphere.com"){
 localStorage.setItem("loggedIn", email);
 localStorage.setItem("role","admin");
@@ -66,7 +66,6 @@ alert("Admin login successful!");
 window.location = "admin.html";
 return;
 }
-/* ====================== */
 
 if(!users[email]){
 users[email]={name,email,password:pass};
@@ -131,7 +130,7 @@ let overlay=document.getElementById("loginOverlay");
 if(overlay) overlay.style.display="none";
 }
 
-/* ================= ADMIN NAV BUTTON ================= */
+/* ================= ADMIN NAV ================= */
 
 function addAdminAccess(){
 
@@ -150,72 +149,6 @@ menu.appendChild(li);
 });
 
 }
-
-}
-
-/* ================= AUTO CATEGORY ================= */
-
-function detectCategory(text){
-
-text=text.toLowerCase();
-
-if(text.includes("road")||text.includes("pothole")) return "Road";
-if(text.includes("water")||text.includes("pipe")||text.includes("leak")) return "Water";
-if(text.includes("electric")||text.includes("power")||text.includes("street light")) return "Electricity";
-if(text.includes("garbage")||text.includes("trash")||text.includes("waste")) return "Garbage";
-if(text.includes("traffic")) return "Traffic";
-if(text.includes("drain")) return "Drainage";
-if(text.includes("bus")||text.includes("transport")) return "Public Transport";
-if(text.includes("noise")) return "Noise Pollution";
-if(text.includes("air")||text.includes("pollution")) return "Air Pollution";
-if(text.includes("construction")) return "Illegal Construction";
-if(text.includes("animal")||text.includes("dog")) return "Animal Issue";
-if(text.includes("health")||text.includes("hospital")) return "Health & Sanitation";
-
-return "Other";
-}
-
-function initializeAutoCategory(){
-
-const issueInput=document.getElementById("issueText");
-const categorySelect=document.getElementById("category");
-
-if(!issueInput||!categorySelect) return;
-
-issueInput.addEventListener("input",()=>{
-categorySelect.value=detectCategory(issueInput.value);
-});
-
-}
-
-/* ================= LIVE LOCATION ================= */
-
-function getLiveLocation(){
-
-if(!navigator.geolocation){
-alert("Geolocation not supported");
-return;
-}
-
-navigator.geolocation.getCurrentPosition(
-
-async (position)=>{
-
-let lat = position.coords.latitude;
-let lon = position.coords.longitude;
-
-try{
-let res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-let data = await res.json();
-document.getElementById("location").value = data.display_name;
-}catch{
-document.getElementById("location").value = `${lat}, ${lon}`;
-}
-
-},
-()=>{ alert("Allow location access"); }
-
-);
 
 }
 
@@ -250,6 +183,7 @@ user:localStorage.getItem("loggedIn"),
 image:e.target.result,
 support:0,
 comments:[],
+volunteers:[],
 status:"pending"
 });
 
@@ -297,8 +231,7 @@ onclick="openMap('${issue.location}')">
 
 <p>${issue.text}</p>
 
-${issue.image && issue.image !== "" ? 
-`<img src="${issue.image}" style="width:100%;max-height:250px;border-radius:10px;margin-top:10px;">` : ""}
+${issue.image ? `<img src="${issue.image}" style="width:100%;max-height:250px;border-radius:10px;margin-top:10px;">` : ""}
 
 <p>Status: ${issue.status}</p>
 <p>Category: ${issue.category}</p>
@@ -317,12 +250,14 @@ ${issue.image && issue.image !== "" ?
 🔁 Share
 </button>
 
+<button onclick="openVolunteerForm('${issue.date}')">
+🤝 Volunteer (${issue.volunteers ? issue.volunteers.length : 0})
+</button>
+
 </div>
 
 <div id="comment-${issue.date}" style="display:none;margin-top:10px;">
-
 <input id="input-${issue.date}" placeholder="Write comment..." style="width:70%">
-
 <button onclick="postComment('${issue.date}')">Post</button>
 
 <div>
@@ -330,7 +265,6 @@ ${(issue.comments||[]).map(c=>`
 <p><strong>${c.user}</strong>: ${c.text}</p>
 `).join("")}
 </div>
-
 </div>
 
 </div>
@@ -341,38 +275,123 @@ ${(issue.comments||[]).map(c=>`
 
 }
 
-/* ================= ADMIN STATUS UPDATE ================= */
+/* ================= ✅ FIXED MY ISSUES ================= */
 
-function changeStatus(index, newStatus){
+function initializeMyIssues(){
+
+const box = document.getElementById("issuesList");
+if(!box) return;
 
 let issues = JSON.parse(localStorage.getItem("issues") || "[]");
+let loggedUser = localStorage.getItem("loggedIn");
 
-if(issues[index]){
+box.innerHTML = "";
+
+let myIssues = issues.filter(issue => issue.user === loggedUser);
+
+if(myIssues.length === 0){
+box.innerHTML = "<p>No issues reported yet.</p>";
+return;
+}
+
+myIssues.forEach(issue => {
+
+box.innerHTML += `
+<div class="issue-card">
+
+<p><strong>${issue.text}</strong></p>
+
+<p>📍 ${issue.location}</p>
+<p>Status: ${issue.status}</p>
+<p>Category: ${issue.category}</p>
+
+${issue.image ? `<img src="${issue.image}" style="width:100%;max-height:200px;border-radius:10px;margin-top:10px;">` : ""}
+
+</div>
+`;
+
+});
+
+}
+
+/* ================= ✅ FIXED PROFILE ================= */
+
+function initializeProfile(){
+
+let nameEl = document.getElementById("profileName");
+let emailEl = document.getElementById("profileEmail");
+let phoneEl = document.getElementById("profilePhone");
+let issuesEl = document.getElementById("profileIssues");
+
+if(!nameEl) return;
+
+let users = JSON.parse(localStorage.getItem("users") || "{}");
+let issues = JSON.parse(localStorage.getItem("issues") || "[]");
+
+let logged = localStorage.getItem("loggedIn");
+
+if(!logged || !users[logged]) return;
+
+let user = users[logged];
+
+nameEl.textContent = "Name: " + (user.name || "N/A");
+emailEl.textContent = "Email: " + (user.email || "N/A");
+phoneEl.textContent = "Phone: " + (user.phone || "N/A");
+
+let count = issues.filter(i => i.user === logged).length;
+issuesEl.textContent = "Reported Issues: " + count;
+
+}
+
+/* ================= OTHER FUNCTIONS ================= */
+
+function openVolunteerForm(date){
+
+let name = prompt("Enter your name:");
+let phone = prompt("Enter your mobile number:");
+let message = prompt("How will you help?");
+
+if(!name || !phone){
+alert("Details required");
+return;
+}
+
+let issues = JSON.parse(localStorage.getItem("issues") || "[]");
+let issue = issues.find(i => i.date === date);
+
+if(!issue.volunteers){
+issue.volunteers = [];
+}
+
+issue.volunteers.push({
+name,
+phone,
+message
+});
+
+localStorage.setItem("issues", JSON.stringify(issues));
+
+alert("You joined as volunteer!");
+location.reload();
+
+}
+
+function changeStatus(index, newStatus){
+let issues = JSON.parse(localStorage.getItem("issues") || "[]");
 issues[index].status = newStatus;
 localStorage.setItem("issues", JSON.stringify(issues));
-alert("Status updated");
 location.reload();
 }
 
-}
-
-/* ================= SUPPORT ================= */
-
 function supportIssue(date){
-
 let issues=JSON.parse(localStorage.getItem("issues")||"[]");
-
 let issue=issues.find(i=>i.date===date);
-
 if(issue){
 issue.support=(issue.support||0)+1;
 localStorage.setItem("issues",JSON.stringify(issues));
 location.reload();
 }
-
 }
-
-/* ================= COMMENTS ================= */
 
 function toggleComment(date){
 let box=document.getElementById("comment-"+date);
@@ -380,7 +399,6 @@ box.style.display = box.style.display==="none"?"block":"none";
 }
 
 function postComment(date){
-
 let input=document.getElementById("input-"+date);
 let text=input.value.trim();
 if(!text) return;
@@ -395,103 +413,13 @@ text
 
 localStorage.setItem("issues",JSON.stringify(issues));
 location.reload();
-
 }
-
-/* ================= SHARE ================= */
 
 function shareIssue(){
 navigator.clipboard.writeText(window.location.href);
 alert("Link copied!");
 }
 
-/* ================= MAP ================= */
-
 function openMap(location){
 window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`);
-}
-
-/* ================= MY ISSUES ================= */
-
-function initializeMyIssues(){
-
-const list=document.getElementById("issuesList");
-if(!list) return;
-
-let user=localStorage.getItem("loggedIn");
-let issues=JSON.parse(localStorage.getItem("issues")||"[]");
-
-list.innerHTML="";
-
-issues.filter(i=>i.user===user).reverse().forEach(issue=>{
-
-list.innerHTML+=`
-<div class="issue-card">
-<h4>${issue.text}</h4>
-<p>📍 ${issue.location}</p>
-
-${issue.image && issue.image !== "" ? 
-`<img src="${issue.image}" style="width:100%;max-height:250px;border-radius:10px;margin-top:10px;">` : ""}
-
-<p>Status: ${issue.status}</p>
-</div>
-`;
-
-});
-
-}
-
-/* ================= PROFILE ================= */
-
-function initializeProfile(){
-
-if(!window.location.pathname.includes("profile.html")) return;
-
-let logged=localStorage.getItem("loggedIn");
-let users=JSON.parse(localStorage.getItem("users")||"{}");
-
-let user=users[logged];
-if(!user) return;
-
-document.getElementById("profileName").innerText=user.name;
-document.getElementById("profileEmail").innerText=user.email;
-
-}
-
-/* ================= LOCATION AUTOCOMPLETE ================= */
-
-function initializeLocationAutocomplete(){
-
-const input=document.getElementById("location");
-const box=document.getElementById("locationSuggestions");
-
-if(!input||!box) return;
-
-input.addEventListener("input",async ()=>{
-
-let q=input.value.trim();
-if(q.length<3){
-box.innerHTML="";
-return;
-}
-
-let res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
-let data=await res.json();
-
-box.innerHTML="";
-
-data.slice(0,5).forEach(p=>{
-let div=document.createElement("div");
-div.innerText=p.display_name;
-
-div.onclick=()=>{
-input.value=p.display_name;
-box.innerHTML="";
-};
-
-box.appendChild(div);
-});
-
-});
-
 }

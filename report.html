@@ -39,15 +39,13 @@
 <input type="file" id="imageInput" accept="image/*">
 
 <label>Location</label>
-
-<!-- ✅ FIXED: Manual + Live both allowed -->
-<input type="text" id="location" placeholder="Enter location manually or click 'Get Live Location'" required>
+<input type="text" id="location" placeholder="Click button to get live location" required readonly>
 
 <button type="button" onclick="getLiveLocation()">📍 Get Live Location</button>
 
 <div id="locationSuggestions" class="suggestions-box"></div>
 
-<!-- ✅ CATEGORY LIST -->
+<!-- ✅ UPDATED CATEGORY LIST -->
 <label>Category</label>
 <select id="category">
 
@@ -59,6 +57,7 @@
 <option value="Women Safety">Women Safety</option>
 <option value="Child Safety">Child Safety</option>
 
+<!-- NEW -->
 <option value="Traffic">Traffic</option>
 <option value="Drainage">Drainage</option>
 <option value="Public Transport">Public Transport</option>
